@@ -6,6 +6,8 @@ interface Props {
     type: 'text' | 'password';
     placeholder: string;
     value: string;
+    message: string;
+    messageError: boolean;
     buttonName?: string;
 
     onChange: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -17,7 +19,9 @@ export default function InputBox({
     type, 
     placeholder, 
     value, 
-    buttonName, 
+    buttonName,
+    message,
+    messageError,
     onChange,
     onButtonClick,
 }: Props) {
@@ -29,7 +33,7 @@ export default function InputBox({
                 <input value={value} type={type} placeholder={placeholder} onChange={onChange} />
                 {buttonName && <div className={`input-button ${value ? 'active' : 'disable'}`} onClick={onButtonClick}>{buttonName}</div>}
             </div>
-            <div className="message"></div>
+            <div className={`message ${messageError ? 'error' : 'primary'}`}>{message}</div>
         </div>
     )
 
