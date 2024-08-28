@@ -2,8 +2,10 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 
+type AuthPath = '회원가입' | '로그인';
+
 interface SnsContainerProps {
-    type: '회원가입' | '로그인';
+    type: AuthPath;
 }
 
 function SnsContainer ({ type }: SnsContainerProps) {
@@ -20,7 +22,11 @@ function SnsContainer ({ type }: SnsContainerProps) {
 
 }
 
-function SignUp() {
+interface AuthComponentProps {
+    onPathChange: (path: AuthPath) => void;
+}
+
+function SignUp({ onPathChange }: AuthComponentProps) {
 
     const [name, setName] = useState<string>('');
     const [id, setId] = useState<string>('');
@@ -136,7 +142,7 @@ function SignUp() {
     const onSignUpButtonHandler = () => {
         if (!isComplete) return;
 
-        alert('회원가입!');
+        onPathChange('로그인');
     };
 
     useEffect(() => {
@@ -171,13 +177,13 @@ function SignUp() {
 
             <div className="button-container">
                 <div className={`button ${isComplete ? 'primary' : 'disable'} full-width`} onClick={onSignUpButtonHandler}>회원가입</div>
-                <div className="link">로그인</div>
+                <div className="link" onClick={() => onPathChange('로그인')}>로그인</div>
             </div>
         </div>
     )
 }
 
-function SignIn() {
+function SignIn({ onPathChange }: AuthComponentProps) {
 
     const [id, setId] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -192,6 +198,17 @@ function SignIn() {
     const onPasswordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setPassword(value);
+    };
+
+    const onSignInButtonHandler = () => {
+        if (!id || !password) return;
+
+        if (id !== 'qwer1234' || password !== 'asdf0987') {
+            setMessage('로그인 정보가 일치하지 않습니다.');
+            return;
+        }
+
+        alert('로그인 성공!');
     };
 
     useEffect(() => {
@@ -209,8 +226,8 @@ function SignIn() {
                 <InputBox value={password} onChange={onPasswordChangeHandler} message={message} messageError type='password' label='비밀번호' placeholder='비밀번호를 입력해주세요.' />
             </div>
             <div className="button-container">
-                <div className="button primary full-width">로그인</div>
-                <div className="link">회원가입</div>
+                <div className="button primary full-width" onClick={onSignInButtonHandler}>로그인</div>
+                <div className="link" onClick={() => onPathChange('회원가입')}>회원가입</div>
             </div>
             <div style={{ width: '64px' }} className="divider"></div>
             <SnsContainer type='로그인' />
@@ -221,12 +238,20 @@ function SignIn() {
 
 export default function Auth() {
 
+    const [path, setPath] = useState<AuthPath>('로그인');
+
+    const onPathChangeHandler = (path: AuthPath) => {
+        setPath(path);
+    };
+
     return (
         <div id="auth-wrapper">
             <div className="auth-image"></div>
             <div className="auth-container">
-                <SignIn />
-                {/* <SignUp /> */}
+                {path === '로그인' ? 
+                <SignIn onPathChange={onPathChangeHandler} /> :
+                <SignUp onPathChange={onPathChangeHandler} />
+                }
             </div>
         </div>
         
