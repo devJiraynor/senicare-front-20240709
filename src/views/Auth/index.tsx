@@ -2,7 +2,25 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 
-export default function Auth() {
+interface SnsContainerProps {
+    type: '회원가입' | '로그인';
+}
+
+function SnsContainer ({ type }: SnsContainerProps) {
+
+    return (
+        <div className="sns-container">
+            <div className="title">SNS {type}</div>
+            <div className="sns-button-container">
+                <div className={`sns-button ${type === '회원가입' ? 'md ' : ''}kakao`}></div>
+                <div className={`sns-button ${type === '회원가입' ? 'md ' : ''}naver`}></div>
+            </div>
+        </div>
+    );
+
+}
+
+function SignUp() {
 
     const [name, setName] = useState<string>('');
     const [id, setId] = useState<string>('');
@@ -132,40 +150,86 @@ export default function Auth() {
     }, [password, passwordCheck]);
     
     return (
-        <div id="auth-wrapper">
-            <div className="auth-image"></div>
-            <div className="auth-container">
-                <div style={{ gap: '16px' }} className="auth-box">
-                    <div className="title-box">
-                        <div className="title">시니케어</div>
-                        <div className="logo"></div>
-                    </div>
-                    <div className="sns-container">
-                        <div className="title">SNS 회원가입</div>
-                        <div className="sns-button-container">
-                            <div className="sns-button md kakao"></div>
-                            <div className="sns-button md naver"></div>
-                        </div>
-                    </div>
-                    <div style={{ width: '64px' }} className="divider"></div>
+        <div style={{ gap: '16px' }} className="auth-box">
+            <div className="title-box">
+                <div className="title">시니케어</div>
+                <div className="logo"></div>
+            </div>
+            <SnsContainer type='회원가입' />
+            <div style={{ width: '64px' }} className="divider"></div>
 
-                    <div className="input-container">
-                        <InputBox messageError={nameMessageError} message={nameMessage} value={name} label='이름' type='text' placeholder='이름을 입력해주세요.' onChange={onNameChangeHandler} />
-                        <InputBox messageError={idMessageError} message={idMessage} value={id} label='아이디' type='text' placeholder='아이디를 입력해주세요.' buttonName='중복 확인' onChange={onIdChangeHandler} onButtonClick={onIdCheckClickHandler} />
-                        <InputBox messageError={passwordMessageError} message={passwordMessage} value={password} label='비밀번호' type='password' placeholder='비밀번호를 입력해주세요.' onChange={onPasswordChangeHandler} />
-                        <InputBox messageError={passwordCheckMessageError} message={passwordCheckMessage} value={passwordCheck} label='비밀번호 확인' type='password' placeholder='비밀번호를 입력해주세요.' onChange={onPasswordCheckChangeHandler} />
-                        <InputBox messageError={telNumberMessageError} message={telNumberMessage} value={telNumber} label='전화번호' type='text' placeholder='-빼고 입력해주세요.' buttonName='전화번호 인증' onChange={onTelNumberChangeHandler} onButtonClick={onTelNumberSendClickHandler} />
-                        {isSend &&
-                        <InputBox messageError={authNumberMessageError} message={authNumberMessage} value={authNumber} label='인증번호' type='text' placeholder='인증번호 4자리를 입력해주세요.' buttonName='인증 확인' onChange={onAuthNumberChangeHandler} onButtonClick={onAuthNumberCheckClickHandler} />
-                        }
-                    </div>
+            <div className="input-container">
+                <InputBox messageError={nameMessageError} message={nameMessage} value={name} label='이름' type='text' placeholder='이름을 입력해주세요.' onChange={onNameChangeHandler} />
+                <InputBox messageError={idMessageError} message={idMessage} value={id} label='아이디' type='text' placeholder='아이디를 입력해주세요.' buttonName='중복 확인' onChange={onIdChangeHandler} onButtonClick={onIdCheckClickHandler} />
+                <InputBox messageError={passwordMessageError} message={passwordMessage} value={password} label='비밀번호' type='password' placeholder='비밀번호를 입력해주세요.' onChange={onPasswordChangeHandler} />
+                <InputBox messageError={passwordCheckMessageError} message={passwordCheckMessage} value={passwordCheck} label='비밀번호 확인' type='password' placeholder='비밀번호를 입력해주세요.' onChange={onPasswordCheckChangeHandler} />
+                <InputBox messageError={telNumberMessageError} message={telNumberMessage} value={telNumber} label='전화번호' type='text' placeholder='-빼고 입력해주세요.' buttonName='전화번호 인증' onChange={onTelNumberChangeHandler} onButtonClick={onTelNumberSendClickHandler} />
+                {isSend &&
+                <InputBox messageError={authNumberMessageError} message={authNumberMessage} value={authNumber} label='인증번호' type='text' placeholder='인증번호 4자리를 입력해주세요.' buttonName='인증 확인' onChange={onAuthNumberChangeHandler} onButtonClick={onAuthNumberCheckClickHandler} />
+                }
+            </div>
 
-                    <div className="button-container">
-                        <div className={`button ${isComplete ? 'primary' : 'disable'} full-width`} onClick={onSignUpButtonHandler}>회원가입</div>
-                        <div className="link">로그인</div>
-                    </div>
-                </div>
+            <div className="button-container">
+                <div className={`button ${isComplete ? 'primary' : 'disable'} full-width`} onClick={onSignUpButtonHandler}>회원가입</div>
+                <div className="link">로그인</div>
             </div>
         </div>
     )
+}
+
+function SignIn() {
+
+    const [id, setId] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+
+    const [message, setMessage] = useState<string>('');
+
+    const onIdChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setId(value);
+    };
+
+    const onPasswordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setPassword(value);
+    };
+
+    useEffect(() => {
+        setMessage('');
+    }, [id, password]);
+
+    return (
+        <div className="auth-box">
+            <div className="title-box">
+                <div className="title">시니케어</div>
+                <div className="logo"></div>
+            </div>
+            <div className="input-container">
+                <InputBox value={id} onChange={onIdChangeHandler} message='' messageError type='text' label='아이디' placeholder='아이디를 입력해주세요.' />
+                <InputBox value={password} onChange={onPasswordChangeHandler} message={message} messageError type='password' label='비밀번호' placeholder='비밀번호를 입력해주세요.' />
+            </div>
+            <div className="button-container">
+                <div className="button primary full-width">로그인</div>
+                <div className="link">회원가입</div>
+            </div>
+            <div style={{ width: '64px' }} className="divider"></div>
+            <SnsContainer type='로그인' />
+        </div>
+    );
+
+}
+
+export default function Auth() {
+
+    return (
+        <div id="auth-wrapper">
+            <div className="auth-image"></div>
+            <div className="auth-container">
+                <SignIn />
+                {/* <SignUp /> */}
+            </div>
+        </div>
+        
+    );
+
 }
