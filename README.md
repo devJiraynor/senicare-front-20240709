@@ -10,6 +10,34 @@
 #### package
 react-router, react-router-dom, react-cookie, zustand, axios
 
+###### 패키지 설치
+```bash
+npm install
+```
+###### 개발모드 실행
+```bash
+npm run start
+```
+###### 개발 빌드
+```bash
+npm run build
+```
+
+#### 경로 구조
+**/auth** : 로그인 및 회원가입  
+  
+**/cs** : 고객 관리 (고객 리스트 보기)  
+**/cs/write** : 고객 등록  
+**/cs/:cutomNumber** : 고객 상세 보기  
+**/cs/:cutomNumber/update** : 고객 수정  
+  
+**/mm** : 용품 관리  (용품 리스트 보기)  
+  
+**/hr** : 인사 관리  (인사 리스트 보기)  
+**/hr/:userId** : 인사 정보 상세 보기  
+**/hr/:userId/update** : 인사 정보 수정 하기  
+  
+
 ***
 
 ### 폴더 구조
