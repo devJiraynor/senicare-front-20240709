@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import './style.css';
 import { useCookies } from 'react-cookie';
+import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, CS_DETAIL_PATH, CS_PATH, HR_PATH, MM_PATH, ROOT_ABSOLUTE_PATH } from 'src/constants';
 
 // component: 로고 컴포넌트 //
 function Logo() {
@@ -28,17 +29,17 @@ function Top() {
 
     // variable: 경로 이름 //
     const path = 
-        pathname.startsWith('/cs') ? '고객 관리' :
-        pathname.startsWith('/mm') ? '용품 관리' :
-        pathname.startsWith('/hr') ? '인사 관리' : '';
+        pathname.startsWith(CS_PATH) ? '고객 관리' :
+        pathname.startsWith(MM_PATH) ? '용품 관리' :
+        pathname.startsWith(HR_PATH) ? '인사 관리' : '';
 
     // function: 네비게이터 함수 //
     const navigator = useNavigate();
 
     // event handler: 로그아웃 버튼 클릭 이벤트 처리 //
     const onLogoutButtonClickHandler = () => {
-        removeCookie('accessToken', { path: '/' });
-        navigator('/auth');
+        removeCookie(ACCESS_TOKEN, { path: ROOT_ABSOLUTE_PATH });
+        navigator(CS_DETAIL_PATH(10));
     };
 
     // render: 상단 컴포넌트 //
@@ -72,7 +73,7 @@ export default function MainLayout() {
 
     // effect: 레이아웃 마운트시 로그인 여부 확인 //
     useEffect(() => {
-        if(!cookies.accessToken) navigator('/auth');
+        if(!cookies[ACCESS_TOKEN]) navigator(AUTH_ABSOLUTE_PATH);
     }, []);
 
     // render: 메인 레이아웃 컴포넌트 렌더링 //
