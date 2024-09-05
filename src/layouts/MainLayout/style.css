@@ -1,0 +1,7 @@
+#main-layout {
+    display: grid;
+    grid-template:
+        "logo top" 77px
+        "side main" minmax(944px, auto)
+        / 257px minmax(1182px, 100%)
+}
