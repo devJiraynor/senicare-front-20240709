@@ -3,5 +3,68 @@
     grid-template:
         "logo top" 77px
         "side main" minmax(944px, auto)
-        / 257px minmax(1182px, 100%)
+        / 257px minmax(1182px, 100%);
+}
+
+#layout-logo {
+    grid-area: logo;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-bottom: 1px solid rgba(233, 236, 239, 1);
+    border-right: 1px solid rgba(233, 236, 239, 1);
+    
+    /* 드래그 방지 */
+    user-select: none;
+    -webkit-user-select:none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+#layout-logo .box {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    cursor: default;
+}
+
+#layout-logo .title {
+    color: rgba(64, 64, 64, 1);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 173%;
+}
+
+#layout-logo .icon {
+    width: 30px;
+    height: 30px;
+
+    background-image: url('/public/images/logo.png');
+    background-size: 100% 100%;
+}
+
+#layout-top {
+    grid-area: top;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border-bottom: 1px solid rgba(233, 236, 239, 1);
+    padding: 0 24px;
+
+    user-select: none;
+}
+
+#layout-top .path {
+    color: rgba(64, 64, 64, 1);
+    font-size: 24px;
+    font-weight: 700;
+}
+
+#layout-side-navigation {
+    grid-area: side;
 }

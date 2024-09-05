@@ -7,7 +7,12 @@ function Logo() {
 
     // render: 로고 컴포넌트 렌더링 //
     return (
-        <div id='layout-log'></div>
+        <div id='layout-logo'>
+            <div className='box'>
+                <div className='title'>시니케어</div>
+                <div className='icon'></div>
+            </div>
+        </div>
     );
 
 }
@@ -17,7 +22,10 @@ function Top() {
 
     // render: 상단 컴포넌트 //
     return (
-        <div id='layout-top'></div>
+        <div id='layout-top'>
+            <div className='path'>고객 관리</div>
+            <div className='button second'>로그아웃</div>
+        </div>
     );
 
 }
