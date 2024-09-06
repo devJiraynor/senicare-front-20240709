@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
-import './Senicare.css';
-import Auth from 'src/views/Auth';
 import { Route, Routes, useNavigate } from 'react-router';
-import MainLayout from './layouts/MainLayout';
 import { useCookies } from 'react-cookie';
+
+import MainLayout from './layouts/MainLayout';
+import Auth from 'src/views/Auth';
+
 import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, AUTH_PATH, CS_ABSOLUTE_PATH, CS_DETAIL_PATH, CS_PATH, CS_UPDATE_PATH, CS_WRITE_PATH, HR_DETAIL_PATH, HR_PATH, HR_UPDATE_PATH, MM_PATH, OTHERS_PATH } from './constants';
+
+import './Senicare.css';
 
 // component: root path 컴포넌트 //
 function Index() {

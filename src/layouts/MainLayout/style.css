@@ -67,4 +67,68 @@
 
 #layout-side-navigation {
     grid-area: side;
+
+    padding: 16px 12px;
+}
+
+#layout-side-navigation .navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#layout-side-navigation .navigation-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    border-radius: 6px;
+    padding: 8px 24px;
+
+    color: var(--gray-color);
+    font-size: 16px;
+    font-weight: 400;
+
+}
+
+#layout-side-navigation .navigation-item:hover {
+    cursor: pointer;
+    background-color: var(--primary-10-color);
+}
+
+#layout-side-navigation .navigation-item.active {
+    background-color: var(--primary-color);
+    
+    color: rgba(255, 255, 255, 1);
+}
+
+#layout-side-navigation .icon {
+    width: 24px;
+    height: 24px;
+
+    background-size: 100% 100%;
+}
+
+.cs-icon {
+    background-image: url(/public/images/cs-icon.png);
+}
+
+.mm-icon {
+    background-image: url(/public/images/mm-icon.png);
+}
+
+.hr-icon {
+    background-image: url(/public/images/hr-icon.png);
+}
+
+.cs-active-icon {
+    background-image: url(/public/images/cs-active-icon.png);
+}
+
+.mm-active-icon {
+    background-image: url(/public/images/mm-active-icon.png);
+}
+
+.hr-active-icon {
+    background-image: url(/public/images/hr-active-icon.png);
 }
