@@ -25,6 +25,11 @@ body {
     font-family: 'Pretendard', sans-serif;
 }
 
+#main-wrapper {
+    padding: 24px;
+    background-color: rgba(238, 238, 238, 0.5);
+}
+
 .message.error {
     color: var(--error-color);
 }

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import './style.css';
 import { useCookies } from 'react-cookie';
-import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, CS_DETAIL_PATH, CS_PATH, HR_PATH, MM_PATH, ROOT_ABSOLUTE_PATH } from 'src/constants';
+import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, CS_ABSOLUTE_PATH, CS_DETAIL_PATH, CS_PATH, HR_ABSOLUTE_PATH, HR_PATH, MM_ABSOLUTE_PATH, MM_PATH, ROOT_ABSOLUTE_PATH } from 'src/constants';
 
 // component: 로고 컴포넌트 //
 function Logo() {
@@ -55,20 +55,36 @@ function Top() {
 // component: 좌측 네비게이션 컴포넌트 //
 function SideNavigation() {
 
+    // state: path 상태 //
+    const { pathname } = useLocation();
+
+    // variable: 특정 경로 여부 변수 //
+    const isCs = pathname.startsWith(CS_PATH);
+    const isMm = pathname.startsWith(MM_PATH);
+    const isHr = pathname.startsWith(HR_PATH);
+
+    // function: 네비게이터 함수 //
+    const navigator = useNavigate();
+
+    // event handler: 네비게이션 아이템 클릭 이벤트 처리 //
+    const onItemClickHandler = (path: string) => {
+        navigator(path);
+    };
+
     // render: 좌측 네비게이션 컴포넌트 //
     return (
         <div id='layout-side-navigation'>
             <div className='navigation'>
-                <div className='navigation-item active'>
-                    <div className='icon cs-active-icon'></div>
+                <div className={`navigation-item ${isCs ? 'active' : ''}`} onClick={() => onItemClickHandler(CS_ABSOLUTE_PATH)}>
+                    <div className={`icon ${isCs ? 'cs-active-icon' : 'cs-icon'}`}></div>
                     <div className='item-text'>고객 관리</div>
                 </div>
-                <div className='navigation-item'>
-                    <div className='icon mm-icon'></div>
+                <div className={`navigation-item ${isMm ? 'active' : ''}`} onClick={() => onItemClickHandler(MM_ABSOLUTE_PATH)}>
+                    <div className={`icon ${isMm ? 'mm-active-icon' : 'mm-icon'}`}></div>
                     <div className='item-text'>용품 관리</div>
                 </div>
-                <div className='navigation-item'>
-                    <div className='icon hr-icon'></div>
+                <div className={`navigation-item ${isHr ? 'active' : ''}`} onClick={() => onItemClickHandler(HR_ABSOLUTE_PATH)}>
+                    <div className={`icon ${isHr ? 'hr-active-icon' : 'hr-icon'}`}></div>
                     <div className='item-text'>인사 관리</div>
                 </div>
             </div>
@@ -97,7 +113,9 @@ export default function MainLayout() {
             <Logo />
             <Top />
             <SideNavigation />
-            <Outlet />
+            <div id='main-wrapper'>
+                <Outlet />
+            </div>
         </div>
     );
 }
