@@ -5,13 +5,16 @@ import { useCookies } from 'react-cookie';
 import MainLayout from './layouts/MainLayout';
 import Auth from 'src/views/Auth';
 
-import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, AUTH_PATH, CS_ABSOLUTE_PATH, CS_DETAIL_PATH, CS_PATH, CS_UPDATE_PATH, CS_WRITE_PATH, HR_DETAIL_PATH, HR_PATH, HR_UPDATE_PATH, MM_PATH, OTHERS_PATH } from './constants';
+import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, AUTH_PATH, CS_ABSOLUTE_PATH, CS_DETAIL_PATH, CS_PATH, CS_UPDATE_PATH, CS_WRITE_PATH, HR_DETAIL_PATH, HR_PATH, MM_PATH, OTHERS_PATH } from './constants';
 
 import './Senicare.css';
 import CS from './views/CS';
 import CSWrite from './views/CS/Write';
 import CSDetail from './views/CS/Detail';
 import CSUpdate from './views/CS/Update';
+import MM from './views/MM';
+import HR from './views/HR';
+import HRDetail from './views/HR/Detail';
 
 // component: root path 컴포넌트 //
 function Index() {
@@ -49,12 +52,11 @@ export default function Senicare() {
                 <Route path={CS_UPDATE_PATH(':customNumber')} element={<CSUpdate />} />
             </Route>
             <Route path={MM_PATH} element={<MainLayout />}>
-                <Route index element={<></>} />
+                <Route index element={<MM />} />
             </Route>
             <Route path={HR_PATH} element={<MainLayout />}>
-                <Route index element={<></>} />
-                <Route path={HR_DETAIL_PATH(':userId')} element={<></>} />
-                <Route path={HR_UPDATE_PATH(':userId')} element={<></>} />
+                <Route index element={<HR />} />
+                <Route path={HR_DETAIL_PATH(':userId')} element={<HRDetail />} />
             </Route>
             <Route path={OTHERS_PATH} element={<Index />} />
         </Routes>
