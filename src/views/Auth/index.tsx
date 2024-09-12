@@ -2,6 +2,8 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import axios from 'axios';
+import { idCheckRequest } from 'src/apis';
+import { IdCheckRequestDto } from 'src/apis/dto/request/auth';
 
 type AuthPath = '회원가입' | '로그인';
 
@@ -119,17 +121,12 @@ function SignUp({ onPathChange }: AuthComponentProps) {
     const onIdCheckClickHandler = () => {
         if (!id) return;
 
-        axios.post('http://localhost:4000/api/v1/auth/id-check', { userId: id })
-            .then(response => {
-                const { data } = response;
-                console.log('then');
-                console.log(data);
-            })
-            .catch(error => {
-                const { data } = error.response;
-                console.log('catch');
-                console.log(data);
-            });
+        const requestBody: IdCheckRequestDto = {
+            userId: id
+        };
+        idCheckRequest(requestBody).then((responseBody) => {
+            
+        });
 
         // const isDuplicated = id === 'qwer1234';
         // const message = isDuplicated ? '이미 사용중인 아이디입니다.' : '사용 가능한 아이디입니다.';
