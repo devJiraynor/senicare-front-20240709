@@ -2,8 +2,8 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import axios from 'axios';
-import { idCheckRequest, telAuthRequest } from 'src/apis';
-import { IdCheckRequestDto, TelAuthRequestDto } from 'src/apis/dto/request/auth';
+import { idCheckRequest, telAuthCheckRequest, telAuthRequest } from 'src/apis';
+import { IdCheckRequestDto, TelAuthCheckRequestDto, TelAuthRequestDto } from 'src/apis/dto/request/auth';
 import { ResponseDto } from 'src/apis/dto/response';
 
 type AuthPath = '회원가입' | '로그인';
@@ -101,6 +101,11 @@ function SignUp({ onPathChange }: AuthComponentProps) {
 
     };
 
+    // function: 전화번호 인증 확인 Response 처리 함수 //
+    const telAuthCheckResponse = (responseBody: ResponseDto | null) => {
+        
+    };
+
     // event handler: 이름 변경 이벤트 처리 //
     const onNameChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
@@ -182,11 +187,15 @@ function SignUp({ onPathChange }: AuthComponentProps) {
     const onAuthNumberCheckClickHandler = () => {
         if (!authNumber) return;
 
-        const isMatched = authNumber === 'Q1W2';
-        const message = isMatched ? '인증번호가 확인되었습니다.' : '인증번호가 일치하지 않습니다.';
-        setAuthNumberMessage(message);
-        setAuthNumberMessageError(!isMatched);
-        setCheckedAuthNumber(isMatched);
+        const requestBody: TelAuthCheckRequestDto = {
+            telNumber, authNumber
+        }
+        telAuthCheckRequest(requestBody).then(telAuthCheckResponse);
+        // const isMatched = authNumber === 'Q1W2';
+        // const message = isMatched ? '인증번호가 확인되었습니다.' : '인증번호가 일치하지 않습니다.';
+        // setAuthNumberMessage(message);
+        // setAuthNumberMessageError(!isMatched);
+        // setCheckedAuthNumber(isMatched);
     };
 
     // event handler: 회원가입 버튼 클릭 이벤트 처리 //
