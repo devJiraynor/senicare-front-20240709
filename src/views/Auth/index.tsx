@@ -2,9 +2,11 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import axios from 'axios';
-import { idCheckRequest, signUpRequest, telAuthCheckRequest, telAuthRequest } from 'src/apis';
-import { IdCheckRequestDto, SignUpRequestDto, TelAuthCheckRequestDto, TelAuthRequestDto } from 'src/apis/dto/request/auth';
+import { idCheckRequest, signInRequest, signUpRequest, telAuthCheckRequest, telAuthRequest } from 'src/apis';
+import { IdCheckRequestDto, SignInRequestDto, SignUpRequestDto, TelAuthCheckRequestDto, TelAuthRequestDto } from 'src/apis/dto/request/auth';
 import { ResponseDto } from 'src/apis/dto/response';
+import { SignInResponseDto } from 'src/apis/dto/response/auth';
+import { useCookies } from 'react-cookie';
 
 type AuthPath = '회원가입' | '로그인';
 
@@ -281,12 +283,34 @@ function SignUp({ onPathChange }: AuthComponentProps) {
 // component: 로그인 화면 컴포넌트 //
 function SignIn({ onPathChange }: AuthComponentProps) {
 
+    // state: 쿠키 상태 //
+    const [cookies, setCookie] = useCookies();
+
     // state: 로그인 입력 정보 상태 //
     const [id, setId] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
     // state: 로그인 입력 메세지 상태 //
     const [message, setMessage] = useState<string>('');
+
+    // function: 로그인 Response 처리 함수 //
+    const signInResponse = (responseBody: SignInResponseDto | ResponseDto | null) => {
+        const message = 
+            !responseBody ? '서버에 문제가 있습니다.' :
+            responseBody.code === 'VF' ? '아이디와 비밀번호를 모두 입력하세요.' :
+            responseBody.code === 'SF' ? '로그인 정보가 일치하지 않습니다.' : 
+            responseBody.code === 'TCF' ? '서버에 문제가 있습니다.' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다.' : '';
+        
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccessed) {
+            setMessage(message);
+            return;
+        }
+
+        const { accessToken, expiration } = responseBody as SignInResponseDto;
+        
+    };
 
     // event handler: 아이디 변경 이벤트 처리 //
     const onIdChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
@@ -304,12 +328,11 @@ function SignIn({ onPathChange }: AuthComponentProps) {
     const onSignInButtonHandler = () => {
         if (!id || !password) return;
 
-        if (id !== 'qwer1234' || password !== 'asdf0987') {
-            setMessage('로그인 정보가 일치하지 않습니다.');
-            return;
-        }
-
-        alert('로그인 성공!');
+        const requestBody: SignInRequestDto = {
+            userId: id,
+            password
+        };
+        signInRequest(requestBody).then(signInResponse);
     };
 
     // effect: 아이디 및 비밀번호 변경시 실행할 함수 //
