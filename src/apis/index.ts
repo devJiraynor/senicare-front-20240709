@@ -15,7 +15,7 @@ const TEL_AUTH_CHECK_API_URL = `${AUTH_MODULE_URL}/tel-auth-check`;
 const SIGN_UP_API_URL = `${AUTH_MODULE_URL}/sign-up`;
 const SIGN_IN_API_URL = `${AUTH_MODULE_URL}/sign-in`;
 
-const NURSE_MODUEL_URL = `${SENICARE_API_DOMAIN}/nurse`;
+const NURSE_MODUEL_URL = `${SENICARE_API_DOMAIN}/api/v1/nurse`;
 
 const GET_SIGN_IN_API_URL = `${NURSE_MODUEL_URL}/sign-in`;
 
