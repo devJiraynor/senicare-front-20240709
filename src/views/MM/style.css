@@ -1,0 +1,51 @@
+#mm-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#mm-wrapper .post-patch-box {
+    display: flex;
+    align-items: end;
+    gap: 16px;
+
+    border-radius: 8px;
+    border: 1px solid rgba(238, 238, 238, 1);
+    padding: 24px;
+
+    background-color: rgba(255, 255, 255, 1);
+}
+
+#mm-wrapper .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+}
+
+#mm-wrapper .main {
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 8px;
+    border: 1px solid rgba(238, 238, 238, 1);
+
+    background-color: rgba(255, 255, 255, 1);
+}
+
+#mm-wrapper .bottom {
+    display: flex;
+    justify-content: center;
+}
+
+#mm-wrapper .post-patch-input-container {
+    flex: 1;
+
+    display: flex;
+    gap: 20px;
+}
+
+#mm-wrapper .input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
