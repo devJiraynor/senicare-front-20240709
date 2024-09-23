@@ -5,6 +5,8 @@ import { ACCESS_TOKEN } from 'src/constants';
 import { PostToolRequestDto } from 'src/apis/dto/request/tool';
 import { getToolListRequest, postToolRequest } from 'src/apis';
 import { ResponseDto } from 'src/apis/dto/response';
+import { Tool } from 'src/types';
+import { GetToolListResponseDto } from 'src/apis/dto/response/tool';
 
 // interface: 용품 등록 컴포넌트 Properties //
 interface PostBoxProps {
@@ -127,6 +129,29 @@ function PatchBox() {
 
 }
 
+// component: 용품 리스트 아이템 컴포넌트 //
+function TableRow() {
+
+    // render: 용품 리스트 아이템 컴포넌트 렌더링 //
+    return (
+        <div className='tr'>
+            <div className='td-tool-number'>용품번호</div>
+            <div className='td-name'>용품명</div>
+            <div className='td-purpose'>용도</div>
+            <div className='td-count'>개수</div>
+            <div className='td-buttons'>
+                <div className='td-edit'>
+                    <div className='icon-button edit'></div>
+                </div>
+                <div className='td-delete'>
+                    <div className='icon-button trash'></div>
+                </div>
+            </div>
+        </div>
+    )
+
+}
+
 // component: 용품 관리 리스트 컴포넌트 //
 export default function MM() {
 
@@ -136,6 +161,26 @@ export default function MM() {
     // state: 등록 및 수정 박스 뷰 상태 //
     const [showPostBox, setShowPostBox] = useState<boolean>(false);
     const [showPatchBox, setShowPatchBox] = useState<boolean>(false);
+
+    // state: 용품 리스트 상태 //
+    const [toolList, setToolList] = useState<Tool[]>([]);
+
+    // function: get tool list response 처리 함수 //
+    const getToolListResponse = (resposenBody: GetToolListResponseDto | ResponseDto | null) => {
+        const message = 
+            !resposenBody ? '서버에 문제가 있습니다.' :
+            resposenBody.code === 'AF' ? '잘못된 접근입니다.' :
+            resposenBody.code === 'DBE' ? '서버에 문제가 있습니다.' : '';
+
+        const isSuccessed = resposenBody !== null && resposenBody.code === 'SU';
+        if (!isSuccessed) {
+            alert(message);
+            return;
+        }
+
+        const { tools } = resposenBody as GetToolListResponseDto;
+        setToolList(tools);
+    };
 
     // function: 등록 박스 뷰 상태 변경 함수 //
     const unShowPostBox = () => setShowPostBox(false);
@@ -150,7 +195,7 @@ export default function MM() {
     useEffect(() => {
         const accessToken = cookies[ACCESS_TOKEN];
         if (!accessToken) return;
-        getToolListRequest(accessToken).then();
+        getToolListRequest(accessToken).then(getToolListResponse);
     }, []);
 
     // render: 용품 관리 리스트 컴포넌트 렌더링 //
@@ -174,23 +219,23 @@ export default function MM() {
                             <div className='td-delete'>삭제</div>
                         </div>
                     </div>
-                    <div className='tr'>
-                        <div className='td-tool-number'>용품번호</div>
-                        <div className='td-name'>용품명</div>
-                        <div className='td-purpose'>용도</div>
-                        <div className='td-count'>개수</div>
-                        <div className='td-buttons'>
-                            <div className='td-edit'>
-                                <div className='icon-button edit'></div>
-                            </div>
-                            <div className='td-delete'>
-                                <div className='icon-button trash'></div>
-                            </div>
-                        </div>
-                    </div>
+                    {toolList.map((tool, index) => <TableRow key={index} />)}
                 </div>
             </div>
-            <div className='bottom'></div>
+            <div className='bottom'>
+                <div className='pagination-box'>
+                    <div className='round-left-button'></div>
+                    <div className='page-list'>
+                        <div className='page active'>1</div>
+                        <div className='page'>2</div>
+                    </div>
+                    <div className='round-right-button'></div>
+                </div>
+                <div className='search-box'>
+                    <input className='search-input' placeholder='검색어를 입력하세요.' />
+                    <div className='button disable'>검색</div>
+                </div>
+            </div>
         </div>
     )
 }
