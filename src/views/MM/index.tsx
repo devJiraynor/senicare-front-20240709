@@ -157,6 +157,11 @@ function TableRow({ tool }: TableRowProps) {
 
 }
 
+// variable: 페이지 당 아이템 수 //
+const ITEMS_PER_PAGE = 5;
+// variable: 섹션 당 페이지 수 //
+const PAGES_PER_SECTION = 5;
+
 // component: 용품 관리 리스트 컴포넌트 //
 export default function MM() {
 
@@ -169,6 +174,13 @@ export default function MM() {
 
     // state: 용품 리스트 상태 //
     const [toolList, setToolList] = useState<Tool[]>([]);
+    // state: 페이징 관련 상태 //
+    const [totalCount, setTotalCount] = useState<number>(0);
+    const [totalPage, setTotalPage] = useState<number>(0);
+    const [totalSection, setTotalSection] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [currentSection, setCurrentSection] = useState<number>(0);
+    const [pageList, setPageList] = useState<number[]>([]);
 
     // function: get tool list response 처리 함수 //
     const getToolListResponse = (resposenBody: GetToolListResponseDto | ResponseDto | null) => {
@@ -196,6 +208,25 @@ export default function MM() {
         setShowPatchBox(false);
     };
 
+    // event handler: 페이지 클릭 이벤트 처리 함수 //
+    const onPageClickHandler = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    // event handler: 이전 섹션 클릭 이벤트 처리 함수 //
+    const onPreSectionClickHandler = () => {
+        if (currentSection === 1) return;
+        setCurrentSection(currentSection - 1);
+        setCurrentPage((currentSection - 1) * PAGES_PER_SECTION);
+    };
+
+    // event handler: 다음 섹션 클릭 이벤트 처리 함수 //
+    const onNextSectionClickHandler = () => {
+        if (currentSection === totalSection) return;
+        setCurrentSection(currentSection + 1);
+        setCurrentPage(currentSection * PAGES_PER_SECTION + 1);
+    };
+
     // effect: 컴포넌트 로드시 용품 리스트 불러오기 함수 //
     useEffect(() => {
         const accessToken = cookies[ACCESS_TOKEN];
@@ -203,13 +234,41 @@ export default function MM() {
         getToolListRequest(accessToken).then(getToolListResponse);
     }, []);
 
+    // effect: toolList가 변경될 시 실행할 함수 //
+    useEffect(() => {
+        if (!toolList.length) return;
+        const totalCount = toolList.length;
+        setTotalCount(totalCount);
+        const totalPage = Math.ceil(totalCount / ITEMS_PER_PAGE);
+        setTotalPage(totalPage);
+        const totalSection = Math.ceil(totalPage / PAGES_PER_SECTION);
+        setTotalSection(totalSection);
+
+        setCurrentPage(1);
+        setCurrentSection(1);
+    }, [toolList]);
+
+    // effect: 현재 섹션이 변경될 시 실행할 함수 //
+    useEffect(() => {
+        const startPage = PAGES_PER_SECTION * currentSection - (PAGES_PER_SECTION - 1);
+        let endPage = PAGES_PER_SECTION * currentSection;
+        if (endPage > totalPage) endPage = totalPage;
+
+        const pageList = [];
+        for (let page = startPage; page <= endPage; page++) {
+            pageList.push(page);
+        }
+        setPageList(pageList);
+
+    }, [currentSection]);
+
     // render: 용품 관리 리스트 컴포넌트 렌더링 //
     return (
         <div id='mm-wrapper'>
             {showPostBox && <PostBox unShow={unShowPostBox} />}
             {showPatchBox && <PatchBox />}
             <div className='top'>
-                <div className='top-text'>전체 <span className='emphasis'>{toolList.length}건</span> | 페이지 <span className='emphasis'>1/100</span></div>
+                <div className='top-text'>전체 <span className='emphasis'>{totalCount}건</span> | 페이지 <span className='emphasis'>{currentPage}/{totalPage}</span></div>
                 {!showPostBox && !showPatchBox && <div className='button primary' onClick={onPostButtonClickHandler}>등록</div>}
             </div>
             <div className='main'>
@@ -229,12 +288,11 @@ export default function MM() {
             </div>
             <div className='bottom'>
                 <div className='pagination-box'>
-                    <div className='round-left-button'></div>
+                    <div className='round-left-button' onClick={onPreSectionClickHandler}></div>
                     <div className='page-list'>
-                        <div className='page active'>1</div>
-                        <div className='page'>2</div>
+                        {pageList.map(page => <div key={page} className={page === currentPage ? 'page active' : 'page'} onClick={() => onPageClickHandler(page)}>{page}</div>)}
                     </div>
-                    <div className='round-right-button'></div>
+                    <div className='round-right-button' onClick={onNextSectionClickHandler}></div>
                 </div>
                 <div className='search-box'>
                     <input className='search-input' placeholder='검색어를 입력하세요.' />
