@@ -210,7 +210,7 @@ export default function MM() {
     const unShowPostBox = () => setShowPostBox(false);
 
     // function: 전체 리스트 변경 함수 //
-    const initViewList = (toolList: Tool[]) => {
+    const init = (toolList: Tool[]) => {
         const totalCount = toolList.length;
         setTotalCount(totalCount);
         const totalPage = Math.ceil(totalCount / ITEMS_PER_PAGE);
@@ -220,6 +220,31 @@ export default function MM() {
 
         setCurrentPage(1);
         setCurrentSection(1);
+    };
+
+    // function: 페이지 변경 함수 //
+    const initViewList = (toolList: Tool[]) => {
+
+        const totalCount = toolList.length;
+        const startIndex = ITEMS_PER_PAGE * (currentPage - 1);
+        let endIndex = startIndex + ITEMS_PER_PAGE;
+        if (endIndex > totalCount) endIndex = totalCount;
+
+        const viewList = toolList.slice(startIndex, endIndex);
+        setViewList(viewList);
+    };
+
+    // function: 섹션 변경 함수 //
+    const initPageList = (totalPage: number) => {
+        const startPage = PAGES_PER_SECTION * currentSection - (PAGES_PER_SECTION - 1);
+        let endPage = PAGES_PER_SECTION * currentSection;
+        if (endPage > totalPage) endPage = totalPage;
+
+        const pageList = [];
+        for (let page = startPage; page <= endPage; page++) {
+            pageList.push(page);
+        }
+        setPageList(pageList);
     };
 
     // event handler: 등록 버튼 클릭 이벤트 처리 함수 //
@@ -238,6 +263,8 @@ export default function MM() {
     const onSearchButtonClickHandler = () => {
         const searchedToolList = originalList.filter(tool => tool.name.includes(searchWord));
         setToolList(searchedToolList);
+        initViewList(searchedToolList);
+        initPageList(searchedToolList.length);
     };
 
     // event handler: 페이지 클릭 이벤트 처리 함수 //
@@ -268,34 +295,21 @@ export default function MM() {
 
     // effect: toolList가 변경될 시 실행할 함수 //
     useEffect(() => {
-        // if (!toolList.length) return;
-        initViewList(toolList);
+        if (!originalList.length) return;
+        init(toolList);
     }, [toolList]);
 
     // effect: 현재 섹션이 변경될 시 실행할 함수 //
     useEffect(() => {
-        // if (!toolList.length) return;
-        const startPage = PAGES_PER_SECTION * currentSection - (PAGES_PER_SECTION - 1);
-        let endPage = PAGES_PER_SECTION * currentSection;
-        if (endPage > totalPage) endPage = totalPage;
-
-        const pageList = [];
-        for (let page = startPage; page <= endPage; page++) {
-            pageList.push(page);
-        }
-        setPageList(pageList);
-    }, [toolList, currentSection]);
+        if (!originalList.length) return;
+        initPageList(totalPage);
+    }, [currentSection]);
 
     // effect: 현재 페이지가 변경될 시 실행할 함수 //
     useEffect(() => {
-        // if (!toolList.length) return;
-        const startIndex = ITEMS_PER_PAGE * (currentPage - 1);
-        let endIndex = startIndex + ITEMS_PER_PAGE;
-        if (endIndex > totalCount) endIndex = totalCount;
-
-        const viewList = toolList.slice(startIndex, endIndex);
-        setViewList(viewList);
-    }, [toolList, currentPage]);
+        if (!originalList.length) return;
+        initViewList(toolList);
+    }, [currentPage]);
 
     // render: 용품 관리 리스트 컴포넌트 렌더링 //
     return (
