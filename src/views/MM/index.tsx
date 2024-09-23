@@ -1,9 +1,9 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import './style.css';
 import { useCookies } from 'react-cookie';
 import { ACCESS_TOKEN } from 'src/constants';
 import { PostToolRequestDto } from 'src/apis/dto/request/tool';
-import { postToolRequest } from 'src/apis';
+import { getToolListRequest, postToolRequest } from 'src/apis';
 import { ResponseDto } from 'src/apis/dto/response';
 
 // interface: 용품 등록 컴포넌트 Properties //
@@ -130,6 +130,9 @@ function PatchBox() {
 // component: 용품 관리 리스트 컴포넌트 //
 export default function MM() {
 
+    // state: cookie 상태 //
+    const [cookies] = useCookies();
+
     // state: 등록 및 수정 박스 뷰 상태 //
     const [showPostBox, setShowPostBox] = useState<boolean>(false);
     const [showPatchBox, setShowPatchBox] = useState<boolean>(false);
@@ -141,7 +144,14 @@ export default function MM() {
     const onPostButtonClickHandler = () => {
         setShowPostBox(true);
         setShowPatchBox(false);
-    }
+    };
+
+    // effect: 컴포넌트 로드시 용품 리스트 불러오기 함수 //
+    useEffect(() => {
+        const accessToken = cookies[ACCESS_TOKEN];
+        if (!accessToken) return;
+        getToolListRequest(accessToken).then();
+    }, []);
 
     // render: 용품 관리 리스트 컴포넌트 렌더링 //
     return (
@@ -152,7 +162,34 @@ export default function MM() {
                 <div className='top-text'>전체 <span className='emphasis'>150건</span> | 페이지 <span className='emphasis'>1/100</span></div>
                 {!showPostBox && !showPatchBox && <div className='button primary' onClick={onPostButtonClickHandler}>등록</div>}
             </div>
-            <div className='main'></div>
+            <div className='main'>
+                <div className='table'>
+                    <div className='th'>
+                        <div className='td-tool-number'>용품번호</div>
+                        <div className='td-name'>용품명</div>
+                        <div className='td-purpose'>용도</div>
+                        <div className='td-count'>개수</div>
+                        <div className='td-buttons'>
+                            <div className='td-edit'>수정</div>
+                            <div className='td-delete'>삭제</div>
+                        </div>
+                    </div>
+                    <div className='tr'>
+                        <div className='td-tool-number'>용품번호</div>
+                        <div className='td-name'>용품명</div>
+                        <div className='td-purpose'>용도</div>
+                        <div className='td-count'>개수</div>
+                        <div className='td-buttons'>
+                            <div className='td-edit'>
+                                <div className='icon-button edit'></div>
+                            </div>
+                            <div className='td-delete'>
+                                <div className='icon-button trash'></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div className='bottom'></div>
         </div>
     )

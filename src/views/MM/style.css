@@ -2,6 +2,8 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    width: 1134px;
 }
 
 #mm-wrapper .post-patch-box {
@@ -66,4 +68,72 @@
 
 #mm-wrapper .top-text .emphasis {
     color: rgba(64, 64, 64, 1);
+}
+
+#mm-wrapper .button.disable:hover {
+    cursor: pointer;
+}
+
+#mm-wrapper .table {
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 8px;
+    border: 1px solid rgba(238, 238, 238, 1);
+
+    background-color: rgba(255, 255, 255, 1);
+}
+
+#mm-wrapper .th {
+    display: flex;
+    gap: 80px;
+
+    padding: 15px 24px;
+
+    color: rgba(64, 64, 64, 1);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#mm-wrapper .tr {
+    display: flex;
+    gap: 80px;
+
+    border-top: 1px solid rgba(238, 238, 238, 1);
+    padding: 15px 24px;
+
+    color: rgba(64, 64, 64, 1);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+}
+
+#mm-wrapper .td-tool-number,
+#mm-wrapper .td-name,
+#mm-wrapper .td-count {
+    width: 100px;
+
+    text-align: center;
+}
+
+#mm-wrapper .td-purpose {
+    width: 300px;
+
+    text-align: center;
+}
+
+#mm-wrapper .tr .td-purpose {
+    text-align: left;
+}
+
+#mm-wrapper .td-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+#mm-wrapper .td-edit,
+#mm-wrapper .td-delete {
+    width: 80px;
+
+    text-align: center;
 }
