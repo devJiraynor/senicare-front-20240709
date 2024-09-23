@@ -172,6 +172,11 @@ export default function MM() {
     const [showPostBox, setShowPostBox] = useState<boolean>(false);
     const [showPatchBox, setShowPatchBox] = useState<boolean>(false);
 
+    // state: 검색어 상태 //
+    const [searchWord, setSearchWord] = useState<string>('');
+
+    // state: 원본 리스트 상태 //
+    const [originalList, setOriginalList] = useState<Tool[]>([]);
     // state: 용품 리스트 상태 //
     const [toolList, setToolList] = useState<Tool[]>([]);
     // state: 페이징 관련 상태 //
@@ -181,6 +186,7 @@ export default function MM() {
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [currentSection, setCurrentSection] = useState<number>(0);
     const [pageList, setPageList] = useState<number[]>([]);
+    const [viewList, setViewList] = useState<Tool[]>([]);
 
     // function: get tool list response 처리 함수 //
     const getToolListResponse = (resposenBody: GetToolListResponseDto | ResponseDto | null) => {
@@ -197,15 +203,41 @@ export default function MM() {
 
         const { tools } = resposenBody as GetToolListResponseDto;
         setToolList(tools);
+        setOriginalList(tools);
     };
 
     // function: 등록 박스 뷰 상태 변경 함수 //
     const unShowPostBox = () => setShowPostBox(false);
 
+    // function: 전체 리스트 변경 함수 //
+    const initViewList = (toolList: Tool[]) => {
+        const totalCount = toolList.length;
+        setTotalCount(totalCount);
+        const totalPage = Math.ceil(totalCount / ITEMS_PER_PAGE);
+        setTotalPage(totalPage);
+        const totalSection = Math.ceil(totalPage / PAGES_PER_SECTION);
+        setTotalSection(totalSection);
+
+        setCurrentPage(1);
+        setCurrentSection(1);
+    };
+
     // event handler: 등록 버튼 클릭 이벤트 처리 함수 //
     const onPostButtonClickHandler = () => {
         setShowPostBox(true);
         setShowPatchBox(false);
+    };
+
+    // event handler: 검색어 변경 이벤트 처리 함수 //
+    const onSearchWordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setSearchWord(value);
+    };
+
+    // event handler: 검색 버튼 클릭 이벤트 처리 함수 //
+    const onSearchButtonClickHandler = () => {
+        const searchedToolList = originalList.filter(tool => tool.name.includes(searchWord));
+        setToolList(searchedToolList);
     };
 
     // event handler: 페이지 클릭 이벤트 처리 함수 //
@@ -236,20 +268,13 @@ export default function MM() {
 
     // effect: toolList가 변경될 시 실행할 함수 //
     useEffect(() => {
-        if (!toolList.length) return;
-        const totalCount = toolList.length;
-        setTotalCount(totalCount);
-        const totalPage = Math.ceil(totalCount / ITEMS_PER_PAGE);
-        setTotalPage(totalPage);
-        const totalSection = Math.ceil(totalPage / PAGES_PER_SECTION);
-        setTotalSection(totalSection);
-
-        setCurrentPage(1);
-        setCurrentSection(1);
+        // if (!toolList.length) return;
+        initViewList(toolList);
     }, [toolList]);
 
     // effect: 현재 섹션이 변경될 시 실행할 함수 //
     useEffect(() => {
+        // if (!toolList.length) return;
         const startPage = PAGES_PER_SECTION * currentSection - (PAGES_PER_SECTION - 1);
         let endPage = PAGES_PER_SECTION * currentSection;
         if (endPage > totalPage) endPage = totalPage;
@@ -259,8 +284,18 @@ export default function MM() {
             pageList.push(page);
         }
         setPageList(pageList);
+    }, [toolList, currentSection]);
 
-    }, [currentSection]);
+    // effect: 현재 페이지가 변경될 시 실행할 함수 //
+    useEffect(() => {
+        // if (!toolList.length) return;
+        const startIndex = ITEMS_PER_PAGE * (currentPage - 1);
+        let endIndex = startIndex + ITEMS_PER_PAGE;
+        if (endIndex > totalCount) endIndex = totalCount;
+
+        const viewList = toolList.slice(startIndex, endIndex);
+        setViewList(viewList);
+    }, [toolList, currentPage]);
 
     // render: 용품 관리 리스트 컴포넌트 렌더링 //
     return (
@@ -283,7 +318,7 @@ export default function MM() {
                             <div className='td-delete'>삭제</div>
                         </div>
                     </div>
-                    {toolList.map((tool, index) => <TableRow key={index} tool={tool} />)}
+                    {viewList.map((tool, index) => <TableRow key={index} tool={tool} />)}
                 </div>
             </div>
             <div className='bottom'>
@@ -295,8 +330,8 @@ export default function MM() {
                     <div className='round-right-button' onClick={onNextSectionClickHandler}></div>
                 </div>
                 <div className='search-box'>
-                    <input className='search-input' placeholder='검색어를 입력하세요.' />
-                    <div className='button disable'>검색</div>
+                    <input className='search-input' value={searchWord} placeholder='검색어를 입력하세요.' onChange={onSearchWordChangeHandler} />
+                    <div className='button disable' onClick={onSearchButtonClickHandler}>검색</div>
                 </div>
             </div>
         </div>
