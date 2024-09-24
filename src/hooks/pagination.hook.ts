@@ -56,8 +56,6 @@ const usePagination = <T>() => {
         let endPage = PAGES_PER_SECTION * currentSection;
         if (endPage > totalPage) endPage = totalPage;
 
-        console.log(endPage);
-
         const pageList = [];
         for (let page = startPage; page <= endPage; page++) {
             pageList.push(page);
@@ -92,7 +90,7 @@ const usePagination = <T>() => {
     // effect: 현재 섹션이 변경될 시 실행할 함수 //
     useEffect(() => {
         initPageList(totalPage);
-    }, [currentSection]);
+    }, [totalCount, currentSection]);
 
     // effect: 현재 페이지가 변경될 시 실행할 함수 //
     useEffect(() => {
@@ -107,7 +105,6 @@ const usePagination = <T>() => {
         pageList,
         setTotalList,
         initViewList,
-        initPageList,
         onPageClickHandler,
         onPreSectionClickHandler,
         onNextSectionClickHandler
