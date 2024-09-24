@@ -25,13 +25,10 @@ const usePagination = <T>() => {
         const totalSection = Math.ceil(totalPage / PAGES_PER_SECTION);
         setTotalSection(totalSection);
 
-        if (!totalCount) {
-            setCurrentPage(0);
-            setCurrentSection(0);
-        } else {
-            setCurrentPage(1);
-            setCurrentSection(1);
-        }
+        setCurrentPage(1);
+        setCurrentSection(1);
+
+        initViewList(totalList);
     };
 
     // function: 페이지 변경 함수 //
