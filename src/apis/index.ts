@@ -3,8 +3,8 @@ import { IdCheckRequestDto, SignInRequestDto, SignUpRequestDto, TelAuthCheckRequ
 import { ResponseDto } from "./dto/response";
 import { SignInResponseDto } from "./dto/response/auth";
 import { GetSignInResponseDto } from "./dto/response/nurse";
-import { PostToolRequestDto } from "./dto/request/tool";
-import { GetToolListResponseDto } from "./dto/response/tool";
+import { PatchToolRequestDto, PostToolRequestDto } from "./dto/request/tool";
+import { GetToolListResponseDto, GetToolResponseDto } from "./dto/response/tool";
 
 // variable: API URL 상수 //
 const SENICARE_API_DOMAIN = 'http://localhost:4000';
@@ -105,6 +105,30 @@ export const postToolRequest = async (requestBody: PostToolRequestDto, accessTok
 export const getToolListRequest = async (accessToken: string) => {
     const responseBody = await axios.get(GET_TOOL_LIST_API_URL, bearerAuthorization(accessToken))
         .then(responseDataHandler<GetToolListResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: get tool 요청 함수 //
+export const getToolRequest = async (toolNumber: number | string, accessToken: string) => {
+    const responseBody = await axios.get(GET_TOOL_API_URL(toolNumber), bearerAuthorization(accessToken))
+        .then(responseDataHandler<GetToolResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: patch tool 요청 함수 //
+export const patchToolRequest = async (requestBody: PatchToolRequestDto, toolNumber: number | string, accessToken: string) => {
+    const responseBody = await axios.patch(PATCH_TOOL_API_URL(toolNumber), requestBody, bearerAuthorization(accessToken))
+        .then(responseDataHandler<ResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: delete tool 요청 함수 //
+export const deleteToolRequest = async (toolNumber: number | string, accessToken: string) => {
+    const responseBody = await axios.delete(DELETE_TOOL_API_URL(toolNumber), bearerAuthorization(accessToken))
+        .then(responseDataHandler<ResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
 };
