@@ -63,8 +63,51 @@
 #cs-write-wrapper .input-box .button {
     display: flex;
     align-items: center;
-    
+
     box-sizing: border-box;
     padding: 0 inherit;
     height: 35px;
+}
+
+#cs-write-wrapper .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100vw;
+    height: 100vh;
+
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+#cs-write-wrapper .modal-box {
+    box-sizing: border-box;
+    border: 1px solid rgba(238, 238, 238, 1);
+    border-radius: 8px;
+    padding: 24px;
+    width: 640px;
+    height: 780px;
+
+    background-color: rgba(255, 255, 255, 1);
+}
+
+#cs-write-wrapper .modal-top {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#cs-write-wrapper .modal-label {
+    color: rgba(64, 64, 64, 1);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#cs-write-wrapper .modal-input-box {
+    display: flex;
+    gap: 12px;
 }
