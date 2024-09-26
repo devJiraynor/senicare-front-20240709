@@ -1,9 +1,14 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import './style.css';
 import { usePagination } from 'src/hooks';
 import Pagination from 'src/components/Pagination';
 import { Customer } from 'src/types';
 import { useSignInUserStore } from 'src/stores';
+import { useCookies } from 'react-cookie';
+import { ACCESS_TOKEN } from 'src/constants';
+import { getCustomerListRequest } from 'src/apis';
+import { GetCustomerListResponseDto } from 'src/apis/dto/response/customer';
+import { ResponseDto } from 'src/apis/dto/response';
 
 // interface: 고객 리스트 아이템 컴포넌트 Properties //
 interface TableRowProps {
@@ -47,14 +52,38 @@ function TableRow({ customer }: TableRowProps) {
 // component: 고객 관리 리스트 화면 컴포넌트 //
 export default function CS() {
 
+    // state: cookie 상태 //
+    const [cookies] = useCookies();
+
     // state: 검색어 상태 //
     const [searchWord, setSearchWord] = useState<string>('');
+
+    // state: 원본 리스트 상태 //
+    const [originalList, setOriginalList] = useState<Customer[]>([]);
 
     // state: 페이징 관련 상태 //
     const {
         currentPage, totalPage, totalCount, viewList,
         setTotalList, initViewList, ...paginationProps
     } = usePagination<Customer>();
+
+    // function: get customer list response 처리 함수 //
+    const getCustomerListResponse = (responseBody: GetCustomerListResponseDto | ResponseDto | null) => {
+        const message = 
+            !responseBody ? '서버에 문제가 있습니다.' :
+            responseBody.code === 'AF' ? '잘못된 접근입니다.' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다.' : '';
+        
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccessed) {
+            alert(message);
+            return;
+        }
+
+        const { customers } = responseBody as GetCustomerListResponseDto;
+        setTotalList(customers);
+        setOriginalList(customers);
+    };
 
     // event handler: 검색어 변경 이벤트 처리 함수 //
     const onSearchWordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
@@ -64,8 +93,17 @@ export default function CS() {
 
     // event handler: 검색 버튼 클릭 이벤트 처리 함수 //
     const onSearchButtonClickHandler = () => {
-
+        const searchedCustomerList = originalList.filter(customer => customer.name.includes(searchWord));
+        setTotalList(searchedCustomerList);
+        initViewList(searchedCustomerList);
     };
+
+    // effect: 컴포넌트 로드시 고객 리스트 불러오기 함수 //
+    useEffect(() => {
+        const accessToken = cookies[ACCESS_TOKEN];
+        if (!accessToken) return;
+        getCustomerListRequest(accessToken).then(getCustomerListResponse);
+    }, []);
     
     // render: 고객 관리 리스트 화면 컴포넌트 렌더링 //
     return (

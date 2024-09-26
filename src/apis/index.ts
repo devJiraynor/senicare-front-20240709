@@ -5,6 +5,7 @@ import { SignInResponseDto } from "./dto/response/auth";
 import { GetSignInResponseDto } from "./dto/response/nurse";
 import { PatchToolRequestDto, PostToolRequestDto } from "./dto/request/tool";
 import { GetToolListResponseDto, GetToolResponseDto } from "./dto/response/tool";
+import { GetCustomerListResponseDto } from "./dto/response/customer";
 
 // variable: API URL 상수 //
 const SENICARE_API_DOMAIN = 'http://localhost:4000';
@@ -28,6 +29,10 @@ const GET_TOOL_LIST_API_URL = `${TOOL_MODULE_URL}`;
 const GET_TOOL_API_URL = (toolNumber: number | string) => `${TOOL_MODULE_URL}/${toolNumber}`;
 const PATCH_TOOL_API_URL = (toolNumber: number | string) => `${TOOL_MODULE_URL}/${toolNumber}`;
 const DELETE_TOOL_API_URL = (toolNumber: number | string) => `${TOOL_MODULE_URL}/${toolNumber}`;
+
+const CUSTOMER_MODULE_URL = `${SENICARE_API_DOMAIN}/api/v1/customer`;
+
+const GET_CUSTOMER_LIST_API_URL = `${CUSTOMER_MODULE_URL}`;
 
 // function: Authorizarion Bearer 헤더 //
 const bearerAuthorization = (accessToken: string) => ({ headers: { 'Authorization': `Bearer ${accessToken}` } })
@@ -129,6 +134,14 @@ export const patchToolRequest = async (requestBody: PatchToolRequestDto, toolNum
 export const deleteToolRequest = async (toolNumber: number | string, accessToken: string) => {
     const responseBody = await axios.delete(DELETE_TOOL_API_URL(toolNumber), bearerAuthorization(accessToken))
         .then(responseDataHandler<ResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: get customer list 요청 함수 //
+export const getCustomerListRequest = async (accessToken: string) => {
+    const responseBody = await axios.get(GET_CUSTOMER_LIST_API_URL, bearerAuthorization(accessToken))
+        .then(responseDataHandler<GetCustomerListResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
 };
