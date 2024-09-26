@@ -1,0 +1,70 @@
+#cs-write-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+
+    width: 1134px;
+}
+
+#cs-write-wrapper .main {
+    display: flex;
+    gap: 25px;
+}
+
+#cs-write-wrapper .bottom {
+    display: flex;
+    justify-content: space-between;
+}
+
+#cs-write-wrapper .profile-image {
+    border-radius: 6px;
+    width: 134px;
+    height: 180px;
+
+    background-image: url(https://blog.kakaocdn.net/dn/4CElL/btrQw18lZMc/Q0oOxqQNdL6kZp0iSKLbV1/img.png);
+    background-position: 50% 50%;
+    background-size: cover;
+
+    cursor: pointer;
+}
+
+#cs-write-wrapper .input-container {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#cs-write-wrapper .input-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
+
+#cs-write-wrapper .input-label {
+    width: 64px;
+
+    color: rgba(64, 64, 64, 1);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#cs-write-wrapper .input {
+    height: 20px;
+}
+
+#cs-write-wrapper .button-box {
+    display: flex;
+    gap: 10px;
+}
+
+#cs-write-wrapper .input-box .button {
+    display: flex;
+    align-items: center;
+    
+    box-sizing: border-box;
+    padding: 0 inherit;
+    height: 35px;
+}
