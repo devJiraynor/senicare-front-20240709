@@ -230,3 +230,49 @@
 #hr-wrapper .button.disable:hover {
     cursor: pointer;
 }
+
+#mm-wrapper .td-buttons,
+#cs-wrapper .td-buttons,
+#hr-wrapper .td-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+#mm-wrapper .td-edit,
+#mm-wrapper .td-delete,
+#cs-wrapper .td-edit,
+#cs-wrapper .td-delete,
+#hr-wrapper .td-edit,
+#hr-wrapper .td-delete {
+    display: flex;
+    justify-content: center;
+
+    width: 80px;
+}
+
+#mm-wrapper .search-box,
+#cs-wrapper .search-box,
+#hr-wrapper .search-box {
+    position: absolute;
+    right: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#mm-wrapper .search-input,
+#cs-wrapper .search-input,
+#hr-wrapper .search-input {
+    box-sizing: border-box;
+    border-radius: 6px;
+    border: 1px solid rgba(238, 238, 238, 1);
+    padding: 8px 16px;
+
+    outline: none;
+
+    font-family: Inter;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 175%;
+}
