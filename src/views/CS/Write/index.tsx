@@ -2,6 +2,14 @@ import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import './style.css';
 import { Address, useDaumPostcodePopup } from 'react-daum-postcode';
 import { useSignInUserStore } from 'src/stores';
+import { usePagination } from 'src/hooks';
+import { useCookies } from 'react-cookie';
+import { ACCESS_TOKEN } from 'src/constants';
+import { getNurseListRequest } from 'src/apis';
+import { GetNurseListResponseDto } from 'src/apis/dto/response/nurse';
+import { ResponseDto } from 'src/apis/dto/response';
+import { Nurse } from 'src/types';
+import Pagination from 'src/components/Pagination';
 
 // variable: 기본 프로필 이미지 URL //
 const defaultProfileImageUrl = 'https://blog.kakaocdn.net/dn/4CElL/btrQw18lZMc/Q0oOxqQNdL6kZp0iSKLbV1/img.png';
@@ -14,6 +22,9 @@ export default function CSWrite() {
 
     // state: 이미지 입력 참조 //
     const imageInputRef = useRef<HTMLInputElement|null>(null);
+
+    // state: cookie 상태 //
+    const [cookies] = useCookies();
 
     // state: 프로필 미리보기 URL 상태 //
     const [previewUrl, setPreviewUrl] = useState<string>(defaultProfileImageUrl);
@@ -29,6 +40,18 @@ export default function CSWrite() {
     const [address, setAddress] = useState<string>('');
     const [location, setLocation] = useState<string>('');
 
+    // state: 검색어 상태 //
+    const [searchWord, setSearchWord] = useState<string>('');
+
+    // state: 원본 리스트 상태 //
+    const [originalList, setOriginalList] = useState<Nurse[]>([]);
+
+    // state: 페이징 관련 상태 //
+    const {
+        currentPage, totalPage, totalCount, viewList,
+        setTotalList, initViewList, ...paginationProps
+    } = usePagination<Nurse>();
+
     // function: 다음 주소 검색 팝업 함수 //
     const daumPostcodePopup = useDaumPostcodePopup();
 
@@ -37,7 +60,24 @@ export default function CSWrite() {
         const { address, sigungu } = result;
         setAddress(address);
         setLocation(sigungu);
-        console.log(sigungu);
+    };
+
+    // function: get nurse list response 처리 함수 //
+    const getNurseListResponse = (responseBody: GetNurseListResponseDto | ResponseDto | null) => {
+        const message =
+            !responseBody ? '서버에 문제가 있습니다.' :
+            responseBody.code === 'AF' ? '잘못된 접근입니다.' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다.' : '';
+
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccessed) {
+            alert(message);
+            return;
+        }
+
+        const { nurses } = responseBody as GetNurseListResponseDto;
+        setTotalList(nurses);
+        setOriginalList(nurses);
     };
 
     // event handler: 프로필 이미지 클릭 이벤트 처리 //
@@ -94,6 +134,13 @@ export default function CSWrite() {
         setModalOpen(!modalOpen);
     };
 
+    // effect: 첫 로드시 요양사 리스트 불러오기 함수 //
+    useEffect(() => {
+        const accessToken = cookies[ACCESS_TOKEN];
+        if (!accessToken) return;
+        getNurseListRequest(accessToken).then(getNurseListResponse);
+    }, []);
+
     // effect: 모달 오픈 상태가 바뀔 시 스크롤 여부 함수 //
     useEffect(() => {
         document.body.style.overflow = modalOpen ? 'hidden' : 'auto';
@@ -146,11 +193,29 @@ export default function CSWrite() {
                     <div className='modal-top'>
                         <div className='modal-label'>담당자 이름</div>
                         <div className='modal-input-box'>
-                            <input />
+                            <input className='modal-input' placeholder='이름을 입력하세요.' />
                             <div className='button disable'>검색</div>
                         </div>
                     </div>
-                    <div className='modal-main'></div>
+                    <div className='modal-main'>
+                        <div className='table'>
+                            <div className='th'>
+                                <div className='td-nurse-id'>ID</div>
+                                <div className='td-nurse-name'>이름</div>
+                                <div className='td-nurse-tel-number'>전화번호</div>
+                            </div>
+                            {viewList.map((nurse, index) => 
+                            <div key={index} className='tr'>
+                                <div className='td-nurse-id'>{nurse.nurseId}</div>
+                                <div className='td-nurse-name'>{nurse.name}</div>
+                                <div className='td-nurse-tel-number'>{nurse.telNumber}</div>
+                            </div>
+                            )}
+                        </div>
+                        <div className='modal-pagination-box'>
+                            <Pagination currentPage={currentPage} {...paginationProps} />
+                        </div>
+                    </div>
                     <div className='modal-bottom'>
                         <div className='button disable' onClick={onModelOpenHandler}>닫기</div>
                     </div>

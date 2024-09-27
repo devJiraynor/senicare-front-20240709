@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import { IdCheckRequestDto, SignInRequestDto, SignUpRequestDto, TelAuthCheckRequestDto, TelAuthRequestDto } from "./dto/request/auth";
 import { ResponseDto } from "./dto/response";
 import { SignInResponseDto } from "./dto/response/auth";
-import { GetSignInResponseDto } from "./dto/response/nurse";
+import { GetNurseListResponseDto, GetSignInResponseDto } from "./dto/response/nurse";
 import { PatchToolRequestDto, PostToolRequestDto } from "./dto/request/tool";
 import { GetToolListResponseDto, GetToolResponseDto } from "./dto/response/tool";
 import { GetCustomerListResponseDto } from "./dto/response/customer";
@@ -20,6 +20,7 @@ const SIGN_IN_API_URL = `${AUTH_MODULE_URL}/sign-in`;
 
 const NURSE_MODUEL_URL = `${SENICARE_API_DOMAIN}/api/v1/nurse`;
 
+const GET_NURSE_LIST_API_URL = `${NURSE_MODUEL_URL}`;
 const GET_SIGN_IN_API_URL = `${NURSE_MODUEL_URL}/sign-in`;
 
 const TOOL_MODULE_URL = `${SENICARE_API_DOMAIN}/api/v1/tool`;
@@ -87,6 +88,14 @@ export const signUpRequest = async (requestBody: SignUpRequestDto) => {
 export const signInRequest = async (requestBody: SignInRequestDto) => {
     const responseBody = await axios.post(SIGN_IN_API_URL, requestBody)
         .then(responseDataHandler<SignInResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: get nurse list 요청 함수 //
+export const getNurseListRequest = async (accessToken: string) => {
+    const responseBody = await axios.get(GET_NURSE_LIST_API_URL, bearerAuthorization(accessToken))
+        .then(responseDataHandler<GetNurseListResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
 };
