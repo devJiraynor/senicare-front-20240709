@@ -145,6 +145,10 @@
     gap: 52px;
 }
 
+#cs-write-wrapper .modal-main .tr {
+    cursor: pointer;
+}
+
 #cs-write-wrapper .modal-main .td-nurse-id,
 #cs-write-wrapper .modal-main .td-nurse-tel-number {
     width: 160px;
