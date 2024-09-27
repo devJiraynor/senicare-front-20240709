@@ -191,7 +191,8 @@
 
 #mm-wrapper .main, 
 #cs-wrapper .main,
-#hr-wrapper .main {
+#hr-wrapper .main,
+#cs-detail-wrapper .main {
     display: flex;
     flex-direction: column;
 

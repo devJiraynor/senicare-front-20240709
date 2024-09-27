@@ -5,7 +5,7 @@ import { SignInResponseDto } from "./dto/response/auth";
 import { GetNurseListResponseDto, GetSignInResponseDto } from "./dto/response/nurse";
 import { PatchToolRequestDto, PostToolRequestDto } from "./dto/request/tool";
 import { GetToolListResponseDto, GetToolResponseDto } from "./dto/response/tool";
-import { GetCustomerListResponseDto, GetCustomerResponseDto } from "./dto/response/customer";
+import { GetCareRecordResponseDto, GetCustomerListResponseDto, GetCustomerResponseDto } from "./dto/response/customer";
 import { PatchCustomerRequestDto, PostCustomerRequestDto } from "./dto/request/customer";
 
 // variable: API URL 상수 //
@@ -39,6 +39,7 @@ const GET_CUSTOMER_LIST_API_URL = `${CUSTOMER_MODULE_URL}`;
 const GET_CUSTOMER_API_URL = (customerNumber: number | string) => `${CUSTOMER_MODULE_URL}/${customerNumber}`;
 const PATCH_CUSTOMER_API_URL = (customerNumber: number | string) => `${CUSTOMER_MODULE_URL}/${customerNumber}`;
 const DELETE_CUSTOMER_API_URL = (customerNumber: number | string) => `${CUSTOMER_MODULE_URL}/${customerNumber}`;
+const GET_CARE_RECORD_LIST_API_URL = (customerNumber: number | string) => `${CUSTOMER_MODULE_URL}/${customerNumber}/care-records`;
 
 // function: Authorizarion Bearer 헤더 //
 const bearerAuthorization = (accessToken: string) => ({ headers: { 'Authorization': `Bearer ${accessToken}` } })
@@ -188,6 +189,14 @@ export const patchCustomerRequest = async (requestBody: PatchCustomerRequestDto,
 export const deleteCustomerRequest = async (customerNumber: number | string, accessToken: string) => {
     const responseBody = await axios.delete(DELETE_CUSTOMER_API_URL(customerNumber), bearerAuthorization(accessToken))
         .then(responseDataHandler<ResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: get care record list 요청 함수 //
+export const getCareRecordListRequest = async (customerNumber: number | string, accessToken: string) => {
+    const responseBody = await axios.get(GET_CARE_RECORD_LIST_API_URL(customerNumber), bearerAuthorization(accessToken))
+        .then(responseDataHandler<GetCareRecordResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;
 };

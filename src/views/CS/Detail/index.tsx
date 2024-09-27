@@ -3,10 +3,12 @@ import './style.css';
 import { useNavigate, useParams } from 'react-router';
 import { useCookies } from 'react-cookie';
 import { ACCESS_TOKEN, CS_ABSOLUTE_PATH, CS_UPDATE_ABSOLUTE_PATH } from 'src/constants';
-import { deleteCustomerRequest, getCustomerRequest } from 'src/apis';
-import { GetCustomerResponseDto } from 'src/apis/dto/response/customer';
+import { deleteCustomerRequest, getCareRecordListRequest, getCustomerRequest } from 'src/apis';
+import { GetCareRecordResponseDto, GetCustomerResponseDto } from 'src/apis/dto/response/customer';
 import { ResponseDto } from 'src/apis/dto/response';
 import { useSignInUserStore } from 'src/stores';
+import { usePagination } from 'src/hooks';
+import { CareRecord } from 'src/types';
 
 // component: 고객 정보 상세 보기 컴포넌트 //
 export default function CSDetail() {
@@ -27,6 +29,12 @@ export default function CSDetail() {
     const [charger, setCharger] = useState<string>('');
     const [chargerName, setChargerName] = useState<string>('');
     const [address, setAddress] = useState<string>('');
+
+    // state: 페이징 관련 상태 //
+    const {
+        currentPage, totalPage, totalCount, viewList,
+        setTotalList, initViewList, ...paginationProps
+    } = usePagination<CareRecord>();
 
     // variable: 담당자 여부 //
     const isCharger = charger === signInUser?.userId;
@@ -57,6 +65,24 @@ export default function CSDetail() {
         setCharger(chargerId);
         setChargerName(chargerName);
         setAddress(address);
+    };
+
+    // function: get care record list response 처리 함수 //
+    const getCareRecordListResponse = (responseBody: GetCareRecordResponseDto | ResponseDto | null) => {
+        const message = 
+            !responseBody ? '서버에 문제가 있습니다.' :
+            responseBody.code === 'VF' ? '잘못된 접근입니다.' :
+            responseBody.code === 'AF' ? '잘못된 접근입니다.' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다.' : '';
+
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccessed) {
+            alert(message);
+            return;
+        }
+
+        const { careRecords } = responseBody as GetCareRecordResponseDto;
+        setTotalList(careRecords);
     };
 
     // function: delete customer response 처리 함수 //
@@ -112,6 +138,7 @@ export default function CSDetail() {
         if (!accessToken) return;
         
         getCustomerRequest(customerNumber, accessToken).then(getCustomerResponse);
+        getCareRecordListRequest(customerNumber, accessToken).then(getCareRecordListResponse);
     }, [customerNumber]);
 
     // render: 고객 정보 상세 보기 컴포넌트 렌더링 //
@@ -141,7 +168,22 @@ export default function CSDetail() {
             <div className='middle'>
                 <div className='title'>관리 기록</div>
                 <div className='main'>
-                    
+                    <div className='table'>
+                        <div className='th'>
+                            <div className='td-record-date'>날짜</div>
+                            <div className='td-record-contents'>내용</div>
+                            <div className='td-used-tool'>사용용품</div>
+                            <div className='td-used-tool-count'>개수</div>
+                        </div>
+                        {viewList.map((careRecord, index) =>
+                        <div key={index} className='tr'>
+                            <div className='td-record-date'>{careRecord.recordDate}</div>
+                            <div className='td-record-contents'>{careRecord.contents}</div>
+                            <div className='td-used-tool'>{careRecord.usedToolName}</div>
+                            <div className='td-used-tool-count'>{careRecord.count}</div>
+                        </div>
+                        )}
+                    </div>
                 </div>
             </div>
             <div className='middle'>
