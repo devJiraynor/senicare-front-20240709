@@ -5,12 +5,13 @@ import { useSignInUserStore } from 'src/stores';
 import { usePagination } from 'src/hooks';
 import { useCookies } from 'react-cookie';
 import { ACCESS_TOKEN, CS_ABSOLUTE_PATH } from 'src/constants';
-import { getNurseListRequest } from 'src/apis';
+import { fileUploadRequest, getNurseListRequest, postCustomerRequest } from 'src/apis';
 import { GetNurseListResponseDto } from 'src/apis/dto/response/nurse';
 import { ResponseDto } from 'src/apis/dto/response';
 import { Nurse } from 'src/types';
 import Pagination from 'src/components/Pagination';
 import { useNavigate } from 'react-router';
+import PostCustomerRequestDto from 'src/apis/dto/request/customer/post-customer.request.dto';
 
 // variable: 기본 프로필 이미지 URL //
 const defaultProfileImageUrl = 'https://blog.kakaocdn.net/dn/4CElL/btrQw18lZMc/Q0oOxqQNdL6kZp0iSKLbV1/img.png';
@@ -82,6 +83,24 @@ export default function CSWrite() {
         const { nurses } = responseBody as GetNurseListResponseDto;
         setTotalList(nurses);
         setOriginalList(nurses);
+    };
+
+    // function: post customer response 처리 함수 //
+    const postCustomerResponse = (responseBody: ResponseDto | null) => {
+        const message = 
+            !responseBody ? '서버에 문제가 있습니다.' : 
+            responseBody.code === 'VF' ? '모두 입력해주세요.' :
+            responseBody.code === 'AF' ? '잘못된 접근입니다.' :
+            responseBody.code === 'NI' ? '존재하지 않는 요양사입니다.' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다.' : '';
+
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccessed) {
+            alert(message);
+            return;
+        }
+
+        navigator(CS_ABSOLUTE_PATH);
     };
 
     // event handler: 프로필 이미지 클릭 이벤트 처리 //
@@ -170,7 +189,25 @@ export default function CSWrite() {
     };
 
     // event handler: 등록 버튼 클릭 이벤트 처리 //
-    const onPostClickHandler = () => {
+    const onPostClickHandler = async () => {
+        if (!name || !birth || !charger || !address || !location) return;
+
+        const accessToken = cookies[ACCESS_TOKEN];
+        if (!accessToken) return;
+
+        let url: string | null = null;
+        if (profileImageFile) {
+            const formData = new FormData();
+            formData.append('file', profileImageFile);
+            url = await fileUploadRequest(formData);
+        }
+        url = url ? url : defaultProfileImageUrl;
+
+        const requestBody: PostCustomerRequestDto = {
+            profileImage: url,
+            name, birth, charger, address, location
+        };
+        postCustomerRequest(requestBody, accessToken).then(postCustomerResponse);
 
     };
 
