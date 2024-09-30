@@ -6,7 +6,7 @@ import { GetNurseListResponseDto, GetSignInResponseDto } from "./dto/response/nu
 import { PatchToolRequestDto, PostToolRequestDto } from "./dto/request/tool";
 import { GetToolListResponseDto, GetToolResponseDto } from "./dto/response/tool";
 import { GetCareRecordResponseDto, GetCustomerListResponseDto, GetCustomerResponseDto } from "./dto/response/customer";
-import { PatchCustomerRequestDto, PostCustomerRequestDto } from "./dto/request/customer";
+import { PatchCustomerRequestDto, PostCareRecordRequestDto, PostCustomerRequestDto } from "./dto/request/customer";
 
 // variable: API URL 상수 //
 const SENICARE_API_DOMAIN = 'http://localhost:4000';
@@ -39,6 +39,7 @@ const GET_CUSTOMER_LIST_API_URL = `${CUSTOMER_MODULE_URL}`;
 const GET_CUSTOMER_API_URL = (customerNumber: number | string) => `${CUSTOMER_MODULE_URL}/${customerNumber}`;
 const PATCH_CUSTOMER_API_URL = (customerNumber: number | string) => `${CUSTOMER_MODULE_URL}/${customerNumber}`;
 const DELETE_CUSTOMER_API_URL = (customerNumber: number | string) => `${CUSTOMER_MODULE_URL}/${customerNumber}`;
+const POST_CARE_RECORD_API_URL = (customerNumber: number | string) => `${CUSTOMER_MODULE_URL}/${customerNumber}/care-record`;
 const GET_CARE_RECORD_LIST_API_URL = (customerNumber: number | string) => `${CUSTOMER_MODULE_URL}/${customerNumber}/care-records`;
 
 // function: Authorizarion Bearer 헤더 //
@@ -188,6 +189,14 @@ export const patchCustomerRequest = async (requestBody: PatchCustomerRequestDto,
 // function: delete customer 요청 함수 //
 export const deleteCustomerRequest = async (customerNumber: number | string, accessToken: string) => {
     const responseBody = await axios.delete(DELETE_CUSTOMER_API_URL(customerNumber), bearerAuthorization(accessToken))
+        .then(responseDataHandler<ResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
+
+// function: post care record 요청 함수 //
+export const postCareRecordRequest = async (requestBody: PostCareRecordRequestDto, customerNumber: number | string, accessToken: string) => {
+    const responseBody = await axios.post(POST_CARE_RECORD_API_URL(customerNumber), requestBody, bearerAuthorization(accessToken))
         .then(responseDataHandler<ResponseDto>)
         .catch(responseErrorHandler);
     return responseBody;

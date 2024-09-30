@@ -17,6 +17,11 @@
     gap: 10px;
 }
 
+#cs-detail-wrapper .middle-bottom {
+    display: flex;
+    justify-content: center;
+}
+
 #cs-detail-wrapper .bottom {
     display: flex;
     justify-content: space-between;

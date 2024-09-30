@@ -3,13 +3,15 @@ import './style.css';
 import { useNavigate, useParams } from 'react-router';
 import { useCookies } from 'react-cookie';
 import { ACCESS_TOKEN, CS_ABSOLUTE_PATH, CS_UPDATE_ABSOLUTE_PATH } from 'src/constants';
-import { deleteCustomerRequest, getCareRecordListRequest, getCustomerRequest, getToolListRequest } from 'src/apis';
+import { deleteCustomerRequest, getCareRecordListRequest, getCustomerRequest, getToolListRequest, postCareRecordRequest } from 'src/apis';
 import { GetCareRecordResponseDto, GetCustomerResponseDto } from 'src/apis/dto/response/customer';
 import { ResponseDto } from 'src/apis/dto/response';
 import { useSignInUserStore } from 'src/stores';
 import { usePagination } from 'src/hooks';
 import { CareRecord, Tool } from 'src/types';
 import { GetToolListResponseDto } from 'src/apis/dto/response/tool';
+import { PostCareRecordRequestDto } from 'src/apis/dto/request/customer';
+import Pagination from 'src/components/Pagination';
 
 // component: 고객 정보 상세 보기 컴포넌트 //
 export default function CSDetail() {
@@ -55,6 +57,14 @@ export default function CSDetail() {
 
     // function: 네비게이터 함수 //
     const navigator = useNavigate();
+
+    // function: 날짜 포멧 변경 함수 //
+    const changeDateFormat = (date: string) => {
+        const yy = date.substring(2,4);
+        const mm = date.substring(5,7);
+        const dd = date.substring(8,10);
+        return `${yy}.${mm}.${dd}`;
+    };
 
     // function: get customer response 처리 함수 //
     const getCustomerResponse = (responseBody: GetCustomerResponseDto | ResponseDto | null) => {
@@ -117,6 +127,29 @@ export default function CSDetail() {
         setToolList(toolList);
     };
 
+    // function: post care record response 처리 함수 //
+    const postCareRecordResponse = (responseBody: ResponseDto | null) => {
+        const message = 
+            !responseBody ? '서버에 문제가 있습니다.' : 
+            responseBody.code === 'VF' ? '유효하지 않은 데이터입니다.' : 
+            responseBody.code === 'AF' ? '잘못된 접근입니다.' : 
+            responseBody.code === 'NP' ? '권한이 없습니다.' :
+            responseBody.code === 'TI' ? '용품의 개수가 부족합니다.' :
+            responseBody.code === 'DBE' ? '서버에 문제가 있습니다.' : '';
+        
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccessed) {
+            alert(message);
+            return;
+        }
+
+        if (!customerNumber) return;
+        const accessToken = cookies[ACCESS_TOKEN];
+        if (!accessToken) return;
+
+        getCareRecordListRequest(customerNumber, accessToken).then(getCareRecordListResponse);
+    };
+
     // function: delete customer response 처리 함수 //
     const deleteCustomerResponse = (responseBody: ResponseDto | null) => {
         const message = 
@@ -167,6 +200,11 @@ export default function CSDetail() {
 
     // event handler: 관리 기록 버튼 클릭 이벤트 처리 //
     const onRecordButtonClickHandler = () => {
+        if (!isCharger) {
+            alert('권한이 없습니다.');
+            return;
+        }
+
         if (!recordContents) {
             alert('내용을 입력하세요.');
             return;
@@ -177,7 +215,18 @@ export default function CSDetail() {
             return;
         }
 
-        
+        if (!customerNumber) return;
+
+        const accessToken = cookies[ACCESS_TOKEN];
+        if (!accessToken) return;
+
+        const requestBody: PostCareRecordRequestDto = {
+            contents: recordContents,
+            usedToolNumber: selectedTool ? selectedTool.toolNumber : null,
+            count: selectedTool ? Number(usedToolCount) : null
+        };
+
+        postCareRecordRequest(requestBody, customerNumber, accessToken).then(postCareRecordResponse);
     };
 
     // event handler: 목록 버튼 클릭 이벤트 처리 //
@@ -254,7 +303,7 @@ export default function CSDetail() {
                         </div>
                         {viewList.map((careRecord, index) =>
                         <div key={index} className='tr'>
-                            <div className='td-record-date'>{careRecord.recordDate}</div>
+                            <div className='td-record-date'>{changeDateFormat(careRecord.recordDate)}</div>
                             <div className='td-record-contents'>{careRecord.contents}</div>
                             <div className='td-used-tool'>{careRecord.usedToolName}</div>
                             <div className='td-used-tool-count'>{careRecord.count}</div>
@@ -262,7 +311,11 @@ export default function CSDetail() {
                         )}
                     </div>
                 </div>
+                <div className='middle-bottom'>
+                    <Pagination currentPage={currentPage} {...paginationProps} />
+                </div>
             </div>
+            {isCharger && 
             <div className='middle'>
                 <div className='title'>기록 작성</div>
                 <div className='record-write-box'>
@@ -271,7 +324,7 @@ export default function CSDetail() {
                             <div className='label'>내용</div>
                             <input className='input' value={recordContents} placeholder='내용을 입력하세요.' onChange={onRecordContentsChangeHandler} />
                         </div>
-                        <div className='button disable'>기록</div>
+                        <div className='button disable' onClick={onRecordButtonClickHandler}>기록</div>
                     </div>
                     <div className='record-write-tool-box'>
                         <div className='input-box'>
@@ -300,6 +353,7 @@ export default function CSDetail() {
                     </div>
                 </div>
             </div>
+            }
             <div className='bottom'>
                 <div className='button primary' onClick={onListButtonClickHandler}>목록</div>
                 {isCharger &&
