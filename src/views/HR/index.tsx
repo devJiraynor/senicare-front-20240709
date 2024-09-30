@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { ChangeEvent, MouseEvent, useEffect, useState } from 'react'
 import './style.css';
 import { usePagination } from 'src/hooks';
 import { Nurse } from 'src/types';
 import { useCookies } from 'react-cookie';
-import { ACCESS_TOKEN } from 'src/constants';
+import { ACCESS_TOKEN, HR_DETAIL_ABSOLUTE_PATH } from 'src/constants';
 import { getNurseListRequest } from 'src/apis';
 import { GetNurseListResponseDto } from 'src/apis/dto/response/nurse';
 import { ResponseDto } from 'src/apis/dto/response';
 import Pagination from 'src/components/Pagination';
+import { useSignInUserStore } from 'src/stores';
+import { useNavigate } from 'react-router';
 
 // interface: 요양사 리스트 아이템 컴포넌트 Properties //
 interface TableRowProps {
@@ -17,19 +19,41 @@ interface TableRowProps {
 // component: 요양사 리스트 아이템 컴포넌트 //
 function TableRow({ nurse }: TableRowProps) {
 
+    // state: 로그인 유저 상태 //
+    const { signInUser } = useSignInUserStore();
+
+    // variable: 본인 여부 //
+    const isSignInUser = nurse.nurseId === signInUser?.userId;
+
+    // function: 네비게이터 함수 //
+    const navigator = useNavigate();
+
+    // event handler: 로우 클릭 이벤트 처리 //
+    const onRowClickHandler = () => {
+        navigator(HR_DETAIL_ABSOLUTE_PATH(nurse.nurseId));
+    };
+
+    // event handler: 수정 버튼 클릭 이벤트 처리 //
+    const onUpdateButtonClickHandler = (event: MouseEvent<HTMLDivElement>) => {
+        event.stopPropagation();
+        navigator(HR_DETAIL_ABSOLUTE_PATH(nurse.nurseId));
+    };
+
     // render: 요양사 리스트 아이템 컴포넌트 렌더링 //
     return (
-        <div className='tr'>
+        <div className='tr' onClick={onRowClickHandler}>
             <div className='td-nurse-infos'>
                 <div className='td-nurse-id'>{nurse.nurseId}</div>
                 <div className='td-nurse-name'>{nurse.name}</div>
                 <div className='td-nurse-tel'>{nurse.telNumber}</div>
             </div>
+            {isSignInUser &&
             <div className='td-buttons'>
                 <div className='td-edit'>
-                    <div className='icon-button edit'></div>
+                    <div className='icon-button edit' onClick={onUpdateButtonClickHandler}></div>
                 </div>
             </div>
+            }
         </div>
     )
 }
@@ -42,6 +66,8 @@ export default function HR() {
 
     // state: 원본 리스트 상태 //
     const [originalList, setOriginalList] = useState<Nurse[]>([]);
+    // state: 검색어 상태 //
+    const [searchWord, setSearchWord] = useState<string>('');
 
     // state: 페이징 관련 상태 //
     const {
@@ -65,6 +91,19 @@ export default function HR() {
         const { nurses } = responseBody as GetNurseListResponseDto;
         setTotalList(nurses);
         setOriginalList(nurses);
+    };
+
+    // event handler: 검색어 변경 이벤트 처리 //
+    const onSearchWordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setSearchWord(value);
+    };
+
+    // event handler: 검색 버튼 클릭 이벤트 처리 //
+    const onSearchButtonClickHandler = () => {
+        const searchedNurseList = originalList.filter(nurse => nurse.name.includes(searchWord));
+        setTotalList(searchedNurseList);
+        initViewList(searchedNurseList);
     };
 
     // effect: 컴포넌트 로드시 요양사 리스트 불러오기 함수 //
@@ -100,6 +139,10 @@ export default function HR() {
             </div>
             <div className='bottom'>
                 <Pagination currentPage={currentPage} {...paginationProps} />
+                <div className='search-box'>
+                    <input className='search-input' value={searchWord} placeholder='검색어를 입력하세요.' onChange={onSearchWordChangeHandler} />
+                    <div className='button disable' onClick={onSearchButtonClickHandler}>검색</div>
+                </div>
             </div>
         </div>
     )
