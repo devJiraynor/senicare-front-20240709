@@ -147,6 +147,13 @@
     border-radius: 6px;
 }
 
+#cs-detail-wrapper .selector.open {
+    position: relative;
+
+    border-radius: 6px 6px 0 0;
+    border-bottom: none;
+}
+
 #cs-detail-wrapper .selector .selected-item {
     flex: 1;
 
@@ -158,11 +165,67 @@
     line-height: 175%;
 }
 
+#cs-detail-wrapper .selector .selector-box {
+    z-index: 9999;
+
+    position: absolute;
+    top: 44px;
+    left: -1px;
+
+    box-sizing: border-box;
+    border-radius: 0 0 6px 6px;
+    border: 1px solid rgba(238, 238, 238, 1);
+    border-top: none;
+    width: 200px;
+    max-height: 132px;
+
+    background-color: rgba(255, 255, 255, 1);
+
+    overflow-y: auto;
+}
+
+#cs-detail-wrapper .selector .selector-box::-webkit-scrollbar {
+    width: 4px;
+    background: none;
+}
+
+#cs-detail-wrapper .selector .selector-box::-webkit-scrollbar-thumb {
+    margin: 4px;
+    border-radius: 15px;
+    width: 4px;
+    background-color: rgba(138, 146, 166, 1);
+}
+
+#cs-detail-wrapper .selector .selector-option {
+    border-top: 1px solid rgba(238, 238, 238, 1);
+    padding: 8px 16px;
+
+    color: rgba(64, 64, 64, 1);
+
+    font-family: Inter;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 175%;
+
+    cursor: pointer;
+    user-select: none;
+}
+
 #cs-detail-wrapper .selector .arrow-down-button {
     width: 24px;
     height: 24px;
 
     background-image: url(/public/images/arrow-down.png);
+    background-size: cover;
+
+    cursor: pointer;
+}
+
+#cs-detail-wrapper .selector .arrow-up-button {
+    width: 24px;
+    height: 24px;
+
+    background-image: url(/public/images/arrow-up.png);
     background-size: cover;
 
     cursor: pointer;
