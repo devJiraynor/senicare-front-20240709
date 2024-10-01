@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import './style.css';
 import { useNavigate, useParams } from 'react-router';
 import { useCookies } from 'react-cookie';
@@ -10,6 +10,7 @@ import { usePagination } from 'src/hooks';
 import Pagination from 'src/components/Pagination';
 import { ChargerdCustomer } from 'src/types';
 import { calculateAge } from 'src/utils';
+import { useHrDetailUpdateStore, useSignInUserStore } from 'src/stores';
 
 // component: 인사 정보 상세 보기 컴포넌트 //
 export default function HRDetail() {
@@ -17,18 +18,28 @@ export default function HRDetail() {
     // state: 요양사 아이디 상태 //
     const { userId } = useParams();
 
+    // state: 로그인 유저 상태 //
+    const { signInUser } = useSignInUserStore();
+    // state: 수정 화면 상태 //
+    const { update, setUpdate } = useHrDetailUpdateStore();
+
     // state: cookie 상태 //
     const [cookies] = useCookies();
 
     // state: 요양사 정보 상태 //
     const [name, setName] = useState<string>('');
     const [telNumber, setTelNumber] = useState<string>('');
+    // state: 요양사 변경 이름 상태 //
+    const [updateName, setUpdateName] = useState<string>('');
 
     // state: 페이징 관련 상태 //
     const {
         currentPage, totalPage, totalCount, viewList,
         setTotalList, initViewList, ...paginationProps
     } = usePagination<ChargerdCustomer>();
+
+    // variable: 본인 여부 //
+    const isSignInUser = userId === signInUser?.userId;
 
     // function: 네비게이터 함수 //
     const navigator = useNavigate();
@@ -70,6 +81,22 @@ export default function HRDetail() {
         setTotalList(customers);
     };
 
+    // event handler: 변경 이름 변경 이벤트 처리 //
+    const onUpdateNameChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setUpdateName(value);
+    };
+
+    // event handler: 목록 버튼 클릭 이벤트 처리 //
+    const onListButtonClickHandler = () => {
+        navigator(HR_ABSOLUTE_PATH);
+    };
+
+    // event handler: 수정 화면 버튼 클릭 이벤트 처리 //
+    const onShowUpdateClickHandler = () => {
+        setUpdate(true);
+    };
+
     // effect: 요양사 아이디가 변경될 시 실행할 함수 //
     useEffect(() => {
         if(!userId) return;
@@ -79,6 +106,11 @@ export default function HRDetail() {
         getNurseRequest(userId, accessToken).then(getNurseResponse);
         getChargedCustomerRequest(userId, accessToken).then(getChargedCustomerResponse);
     }, [userId]);
+
+    // effect: update 상태가 변경될 시 실행할 함수 //
+    useEffect(() => {
+        setUpdateName(name);
+    }, [update, name]);
 
     // render: 인사 정보 상세 보기 컴포넌트 렌더링 //
     return (
@@ -90,7 +122,10 @@ export default function HRDetail() {
                 </div>
                 <div className='info-box'>
                     <div className='label'>이름</div>
+                    {update ? 
+                    <input className='input' value={updateName} placeholder='이름을 입력해주세요.' onChange={onUpdateNameChangeHandler} /> :
                     <div className='text'>{name}</div>
+                    }
                 </div>
                 <div className='info-box'>
                     <div className='label'>전화번호</div>
@@ -120,8 +155,8 @@ export default function HRDetail() {
                 </div>
             </div>
             <div className='bottom'>
-                <div className='button primary'>목록</div>
-                <div className='button second'>수정</div>
+                <div className='button primary' onClick={onListButtonClickHandler}>목록</div>
+                {isSignInUser && <div className='button second' onClick={onShowUpdateClickHandler}>수정</div>}
             </div>
         </div>
     )

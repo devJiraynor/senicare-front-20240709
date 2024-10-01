@@ -8,7 +8,7 @@ import { getNurseListRequest } from 'src/apis';
 import { GetNurseListResponseDto } from 'src/apis/dto/response/nurse';
 import { ResponseDto } from 'src/apis/dto/response';
 import Pagination from 'src/components/Pagination';
-import { useSignInUserStore } from 'src/stores';
+import { useHrDetailUpdateStore, useSignInUserStore } from 'src/stores';
 import { useNavigate } from 'react-router';
 
 // interface: 요양사 리스트 아이템 컴포넌트 Properties //
@@ -21,6 +21,8 @@ function TableRow({ nurse }: TableRowProps) {
 
     // state: 로그인 유저 상태 //
     const { signInUser } = useSignInUserStore();
+    // state: 디테일 수정 화면 상태 //
+    const { setUpdate } = useHrDetailUpdateStore();
 
     // variable: 본인 여부 //
     const isSignInUser = nurse.nurseId === signInUser?.userId;
@@ -30,12 +32,14 @@ function TableRow({ nurse }: TableRowProps) {
 
     // event handler: 로우 클릭 이벤트 처리 //
     const onRowClickHandler = () => {
+        setUpdate(false);
         navigator(HR_DETAIL_ABSOLUTE_PATH(nurse.nurseId));
     };
 
     // event handler: 수정 버튼 클릭 이벤트 처리 //
     const onUpdateButtonClickHandler = (event: MouseEvent<HTMLDivElement>) => {
         event.stopPropagation();
+        setUpdate(true);
         navigator(HR_DETAIL_ABSOLUTE_PATH(nurse.nurseId));
     };
 
