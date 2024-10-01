@@ -97,3 +97,8 @@
     font-weight: 400;
     line-height: 175%;
 }
+
+#hr-detail-wrapper .button-box {
+    display: flex;
+    gap: 12px;
+}
